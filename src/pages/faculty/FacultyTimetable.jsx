@@ -1,7 +1,25 @@
 import { useEffect, useState } from "react";
 import FacultyLayout from "../../components/layout/FacultyLayout";
 import { useFacultyStore } from "../../store/facultyStore";
-import TimetableGrid, { DAYS, TIME_SLOTS } from "../../components/timetable/TimetableGrid";
+import TimetableGrid from "../../components/timetable/TimetableGrid";
+
+const DAYS = [
+  "Day Order 1", "Day Order 2", "Day Order 3",
+  "Day Order 4", "Day Order 5",
+];
+
+const TIME_SLOTS = [
+  { s: 1,  f: "08:00", t: "08:50" },
+  { s: 2,  f: "08:50", t: "09:40" },
+  { s: 3,  f: "09:45", t: "10:35" },
+  { s: 4,  f: "10:40", t: "11:30" },
+  { s: 5,  f: "11:35", t: "12:25" },
+  { s: 6,  f: "12:30", t: "01:20" },
+  { s: 7,  f: "01:25", t: "02:15" },
+  { s: 8,  f: "02:20", t: "03:10" },
+  { s: 9,  f: "03:10", t: "04:00" },
+  { s: 10, f: "04:00", t: "04:50" },
+];
 
 const btnBase   = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-150";
 const activeBtn = "bg-blue-600 text-white shadow-sm shadow-blue-500/20";

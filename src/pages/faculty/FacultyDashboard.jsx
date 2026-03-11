@@ -1,28 +1,41 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import  FacultyLayout from "../../components/layout/FacultyLayout";
+import FacultyLayout from "../../components/layout/FacultyLayout";
 import { useFacultyStore } from "../../store/facultyStore";
 import { useAuthStore } from "../../store/authStore";
-import TIME_SLOTS from "../../components/timetable/SlotSelector";
+
+// Defined locally — SlotSelector does NOT export TIME_SLOTS
+const TIME_SLOTS = [
+  { s: 1,  f: "08:00", t: "08:50" },
+  { s: 2,  f: "08:50", t: "09:40" },
+  { s: 3,  f: "09:45", t: "10:35" },
+  { s: 4,  f: "10:40", t: "11:30" },
+  { s: 5,  f: "11:35", t: "12:25" },
+  { s: 6,  f: "12:30", t: "01:20" },
+  { s: 7,  f: "01:25", t: "02:15" },
+  { s: 8,  f: "02:20", t: "03:10" },
+  { s: 9,  f: "03:10", t: "04:00" },
+  { s: 10, f: "04:00", t: "04:50" },
+];
 
 const QUICK = [
-  { to: "/faculty/subjects",    icon: "📖", label: "My Subjects",      desc: "View assigned subjects",   color: "blue"   },
-  { to: "/faculty/willingness", icon: "📋", label: "Willingness Form",  desc: "Set your availability",    color: "amber"  },
-  { to: "/faculty/timetable",   icon: "🗓", label: "My Timetable",     desc: "View your schedule",       color: "violet" },
+  { to: "/faculty/subjects",    icon: "📖", label: "My Subjects",     desc: "View assigned subjects",  color: "blue"   },
+  { to: "/faculty/willingness", icon: "📋", label: "Willingness Form", desc: "Set your availability",   color: "amber"  },
+  { to: "/faculty/timetable",   icon: "🗓", label: "My Timetable",    desc: "View your schedule",      color: "violet" },
 ];
 
 const colorMap = {
-  blue:   { bg: "bg-blue-500/10",   border: "border-blue-500/20",   text: "text-blue-500 dark:text-blue-400",   stat: "text-blue-500 dark:text-blue-400"   },
-  amber:  { bg: "bg-amber-500/10",  border: "border-amber-500/20",  text: "text-amber-500 dark:text-amber-400", stat: "text-amber-500 dark:text-amber-400"  },
-  violet: { bg: "bg-violet-500/10", border: "border-violet-500/20", text: "text-violet-500 dark:text-violet-400",stat:"text-violet-500 dark:text-violet-400" },
-  green:  { bg: "bg-emerald-500/10",border: "border-emerald-500/20",text: "text-emerald-500 dark:text-emerald-400",stat:"text-emerald-500 dark:text-emerald-400"},
+  blue:   { bg: "bg-blue-500/10",   border: "border-blue-500/20",   stat: "text-blue-500 dark:text-blue-400"    },
+  amber:  { bg: "bg-amber-500/10",  border: "border-amber-500/20",  stat: "text-amber-500 dark:text-amber-400"  },
+  violet: { bg: "bg-violet-500/10", border: "border-violet-500/20", stat: "text-violet-500 dark:text-violet-400"},
+  green:  { bg: "bg-emerald-500/10",border: "border-emerald-500/20",stat: "text-emerald-500 dark:text-emerald-400"},
 };
 
 export default function FacultyDashboard() {
   const { assignedSubjects, timetable, fetchAssignedSubjects, fetchFacultyTimetable } = useFacultyStore();
   const user = useAuthStore((s) => s.user);
-  const [time,     setTime]     = useState(new Date());
-  const [todayDO,  setTodayDO]  = useState(1);
+  const [time,    setTime]    = useState(new Date());
+  const [todayDO, setTodayDO] = useState(1);
 
   useEffect(() => {
     fetchAssignedSubjects();
@@ -31,16 +44,16 @@ export default function FacultyDashboard() {
     return () => clearInterval(t);
   }, []);
 
-  const hr = time.getHours();
-  const greeting = hr < 12 ? "Good morning" : hr < 17 ? "Good afternoon" : "Good evening";
-  const todayKey  = `Day Order ${todayDO}`;
+  const hr         = time.getHours();
+  const greeting   = hr < 12 ? "Good morning" : hr < 17 ? "Good afternoon" : "Good evening";
+  const todayKey   = `Day Order ${todayDO}`;
   const todaySlots = (timetable || []).filter((e) => e.day === todayKey).sort((a, b) => a.slot - b.slot);
 
   const stats = [
-    { icon: "📖", label: "My Subjects",  value: assignedSubjects?.length ?? 0, color: "blue"   },
-    { icon: "🗓", label: "Classes Today", value: todaySlots.length,             color: "violet" },
-    { icon: "🔬", label: "Lab Sessions",  value: (timetable||[]).filter((e) => e.isLab).length, color: "green"  },
-    { icon: "📅", label: "Total Slots",   value: (timetable||[]).length,        color: "amber"  },
+    { icon: "📖", label: "My Subjects",  value: assignedSubjects?.length ?? 0,                   color: "blue"   },
+    { icon: "🗓", label: "Classes Today", value: todaySlots.length,                               color: "violet" },
+    { icon: "🔬", label: "Lab Sessions",  value: (timetable||[]).filter((e) => e.isLab).length,   color: "green"  },
+    { icon: "📅", label: "Total Slots",   value: (timetable||[]).length,                          color: "amber"  },
   ];
 
   return (
@@ -50,25 +63,18 @@ export default function FacultyDashboard() {
       <div className="relative overflow-hidden rounded-2xl mb-6
         bg-gradient-to-br from-blue-500/10 via-violet-500/5 to-transparent
         border border-blue-500/20 p-6 animate-fade-up">
-
         <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full
           bg-blue-500 blur-3xl opacity-10 pointer-events-none" />
-
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-blue-500 mb-1">
-              👤 Faculty Portal
-            </p>
+            <p className="text-xs font-bold uppercase tracking-widest text-blue-500 mb-1">👤 Faculty Portal</p>
             <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
               {greeting}, {user?.name?.split(" ").pop() || "Faculty"} 👋
             </h1>
-            <p className="text-sm text-gray-500 dark:text-slate-500 mt-1">
-              Here's your overview for today.
-            </p>
+            <p className="text-sm text-gray-500 dark:text-slate-500 mt-1">Here's your overview for today.</p>
           </div>
 
           <div className="flex flex-col gap-2 items-end">
-            {/* Clock */}
             <div className="bg-white dark:bg-white/[0.05] border border-gray-200 dark:border-white/[0.08]
               rounded-2xl px-5 py-2.5 text-center">
               <p className="text-xl font-extrabold font-mono text-blue-500 leading-none">
@@ -78,10 +84,8 @@ export default function FacultyDashboard() {
                 {time.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" })}
               </p>
             </div>
-
-            {/* DO selector */}
             <div className="flex gap-1">
-              {[1, 2, 3, 4, 5].map((d) => (
+              {[1,2,3,4,5].map((d) => (
                 <button key={d} onClick={() => setTodayDO(d)}
                   className={`w-8 h-8 rounded-lg text-xs font-bold font-mono transition-all
                     ${todayDO === d
@@ -102,11 +106,9 @@ export default function FacultyDashboard() {
           const c = colorMap[s.color];
           return (
             <div key={s.label}
-              className="flex items-center gap-3 p-4
-                bg-white dark:bg-[#0f1626]
-                border border-gray-200 dark:border-white/[0.07]
-                rounded-2xl hover:-translate-y-0.5 hover:shadow-lg
-                transition-all duration-200 animate-fade-up"
+              className="flex items-center gap-3 p-4 bg-white dark:bg-[#0f1626]
+                border border-gray-200 dark:border-white/[0.07] rounded-2xl
+                hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 animate-fade-up"
               style={{ animationDelay: `${i * 60}ms` }}>
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 border ${c.bg} ${c.border}`}>
                 {s.icon}
@@ -123,16 +125,12 @@ export default function FacultyDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
         {/* ── Today's schedule ── */}
-        <div className="bg-white dark:bg-[#0f1626]
-          border border-gray-200 dark:border-white/[0.07]
+        <div className="bg-white dark:bg-[#0f1626] border border-gray-200 dark:border-white/[0.07]
           rounded-2xl p-5 animate-fade-up delay-3">
-
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100 dark:border-white/[0.06]">
             <div className="flex items-center gap-2">
               <span className="text-base">📅</span>
-              <span className="text-sm font-bold text-gray-800 dark:text-slate-200">
-                Day Order {todayDO} Schedule
-              </span>
+              <span className="text-sm font-bold text-gray-800 dark:text-slate-200">Day Order {todayDO} Schedule</span>
             </div>
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold
               bg-blue-100 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400">
@@ -167,7 +165,7 @@ export default function FacultyDashboard() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-gray-800 dark:text-slate-200 truncate">
-                        {e.subjectId?.name || "Subject"}
+                        {e.subjectId?.name || e.subjectName || "Subject"}
                       </p>
                       {ts && (
                         <p className="text-xs font-mono text-gray-400 dark:text-slate-500 mt-0.5">
@@ -201,12 +199,9 @@ export default function FacultyDashboard() {
               const c = colorMap[q.color];
               return (
                 <Link key={q.to} to={q.to} className="no-underline block">
-                  <div className={`flex items-center gap-4 p-4 rounded-2xl
-                    bg-white dark:bg-[#0f1626]
-                    border border-gray-200 dark:border-white/[0.07]
-                    hover:-translate-y-0.5 hover:shadow-lg
-                    transition-all duration-200 cursor-pointer
-                    animate-fade-up`}
+                  <div className="flex items-center gap-4 p-4 rounded-2xl
+                    bg-white dark:bg-[#0f1626] border border-gray-200 dark:border-white/[0.07]
+                    hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 cursor-pointer animate-fade-up"
                     style={{ animationDelay: `${(i + 5) * 60}ms` }}>
                     <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0 border ${c.bg} ${c.border}`}>
                       {q.icon}
@@ -222,11 +217,9 @@ export default function FacultyDashboard() {
             })}
           </div>
 
-          {/* Subjects preview */}
           {assignedSubjects?.length > 0 && (
             <div className="mt-3 bg-white dark:bg-[#0f1626]
-              border border-gray-200 dark:border-white/[0.07]
-              rounded-2xl p-4 animate-fade-up delay-6">
+              border border-gray-200 dark:border-white/[0.07] rounded-2xl p-4 animate-fade-up delay-6">
               <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-slate-600 mb-3">
                 My Subjects
               </p>
@@ -249,6 +242,7 @@ export default function FacultyDashboard() {
             </div>
           )}
         </div>
+
       </div>
     </FacultyLayout>
   );

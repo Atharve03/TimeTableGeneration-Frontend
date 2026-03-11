@@ -116,6 +116,7 @@ export default function Sidebar({ role, isOpen, onClose }) {
               <NavItem to="/admin/subjects"           icon="📚" label="Subjects"         isAdmin onClose={onClose} />
               <NavItem to="/admin/assign-subject"     icon="🔗" label="Assign Subjects"  isAdmin onClose={onClose} />
               <NavItem to="/admin/semester"           icon="🗓" label="Set Semester"     isAdmin onClose={onClose} />
+              <NavItem to="/admin/rooms"              icon="🏫" label="Manage Rooms"     isAdmin onClose={onClose} />
               <SectionLabel>Timetable</SectionLabel>
               <NavItem to="/admin/willingness"        icon="✋" label="Willingness"      isAdmin onClose={onClose} />
               <NavItem to="/admin/timetable/generate" icon="⚡" label="Generate"         isAdmin onClose={onClose} />

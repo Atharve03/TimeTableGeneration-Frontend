@@ -2,8 +2,12 @@ import { useEffect, useState } from "react";
 import FacultyLayout from "../../components/layout/FacultyLayout";
 import { useFacultyStore } from "../../store/facultyStore";
 import SlotSelector from "../../components/timetable/SlotSelector";
-import { DAYS } from "../../components/timetable/TimetableGrid";
 import axios from "../../api/axiosInstance";
+
+const DAYS = [
+  "Day Order 1", "Day Order 2", "Day Order 3",
+  "Day Order 4", "Day Order 5",
+];
 
 const PROGRAMS = [
   { value: "btech", label: "B.Tech", sems: 8, color: "blue"   },
@@ -67,14 +71,21 @@ export default function WillingnessForm() {
   const [loadingSubs,setLoadingSubs]= useState(false);
 
   // Load subjects when program changes
-  useEffect(() => {
-    if (!program) return;
-    setLoadingSubs(true);
-    axios.get(`/admin/subjects?program=${program}`)
-      .then((r) => setAllSubjects(r.data))
-      .catch(() => setAllSubjects([]))
-      .finally(() => setLoadingSubs(false));
-  }, [program]);
+useEffect(() => {
+  if (!program) return;
+
+  setLoadingSubs(true);
+
+axios.get(`/teachers/subjects`)
+  .then((r) => {
+    const subjects = r.data.subjects || [];
+    const filtered = subjects.filter(s => s.program === program);
+    setAllSubjects(filtered);
+  })
+    .catch(() => setAllSubjects([]))
+    .finally(() => setLoadingSubs(false));
+
+}, [program]);
 
   const maxSems = PROGRAMS.find((p) => p.value === program)?.sems || 8;
 
